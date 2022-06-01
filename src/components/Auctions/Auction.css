@@ -1,0 +1,22 @@
+.liveauction-card{
+    width: min-content!;
+}
+
+closeButton{
+color: aliceblue !important;
+}
+
+.top_martg{
+    margin-top: -9rem;
+    margin-left: 0rem;
+}
+
+.timer_here{
+    margin-top: -7.5rem;
+    margin-left: 0rem;
+}
+
+.inner_div_model{
+    display: flex;
+    justify-content: end;
+}

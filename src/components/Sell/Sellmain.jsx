@@ -73,15 +73,15 @@ export default function Sellmain() {
     console.log("check", res);
     let jsonUsrl = res.token_uri;
     // let img_url=res_here.config.url;
-    if(jsonUsrl==null){
-      jsonUsrl=jsonUsrl
-      urlhere="https://images.app.goo.gl/ukHQE5vYXEhxKQiy9"
-    }else{
-      jsonUsrl=await axios.get(jsonUsrl);
+    // if(jsonUsrl==undefined){
+    //   jsonUsrl=jsonUsrl
+    //   urlhere="https://images.app.goo.gl/ukHQE5vYXEhxKQiy9"
+    // }else{
+    //   jsonUsrl=await axios.get(jsonUsrl);
 
-      console.log("jsonUsrl", jsonUsrl.data.image);
-       urlhere=jsonUsrl.data.image
-    }
+    //   console.log("jsonUsrl", jsonUsrl.data.image);
+    //    urlhere=jsonUsrl.data.image
+    // }
    
 
 
@@ -108,7 +108,7 @@ export default function Sellmain() {
     imageArray = [
       ...imageArray,
       {
-        url: urlhere,
+        url: jsonUsrl,
         name: name,
         owner_of: owner_of,
         token_address: token_address,
@@ -306,16 +306,8 @@ export default function Sellmain() {
             let sold = MarketItemId.sold;
             let tokenId = MarketItemId.tokenId;
 
-
-
-
-
-
-
-
-
-            let postapiPushdata = await axios.post('https://whenftapi.herokuapp.com/nft_marketplace', {
-              "uid": value_price,
+            price = web3.utils.fromWei(price)
+            let postapiPushdata = await axios.post('https://whenftapi.herokuapp.com/open_marketplace', {
               "useraddress": acc,
               "itemId": itemId,
               "nftContract": nftContract,

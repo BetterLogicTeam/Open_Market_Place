@@ -1,7 +1,8 @@
-import React, { Component } from 'react'
+import React, { useEffect, useState } from 'react'
+
 import Modal from 'react-bootstrap/Modal'
 import Form from 'react-bootstrap/Form'
-import Button from 'react-bootstrap-buttons'
+
 import Web3 from 'web3'
 import {
   CONTRACT_ABI,
@@ -13,313 +14,270 @@ import { nftMarketContractAddress, nftMarketContractAddress_Abi } from '../Utils
 import { loadWeb3 } from '../Api/api'
 import axios from 'axios'
 import { toast } from "react-toastify";
+import { useParams, useHistory } from "react-router-dom";
+import Footer from '../Footer/Footer'
 
-const handleCreateAuction = async () => {
-  let id = window.location.pathname
-  id = id.split('/')[2]
-  id = Web3.utils.hexToNumber(id)
-  let address
-  if (typeof window.ethereum != 'undefined') {
-    const web3 = new Web3(window.ethereum)
-    const accounts = await window.ethereum.request({
-      method: 'eth_requestAccounts'
-    })
-    address = accounts[0]
-    console.log('address', address)
-    let price = document.getElementById('price').value
-    price = web3.utils.toWei(price, 'ether')
-    const duration = document.getElementById('duration').value
 
-    const nftContract = new web3.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS)
 
-    await nftContract.methods
-      .approve(`${ESCROW_CONTRACT_ADDRESS}`, id)
-      .send({
-        from: address
-        // to: CONTRACT_ADDRESS,
-      })
-      .on('transactionHash', function () {
-        console.log('Transaction Processing............')
-      })
-      .on('receipt', function () {
-        console.log('Reciept')
-      })
-      .on('confirmation', function () {
-        console.log('Transaction Confirmed')
-      })
-      .on('error', async function () {
-        console.log('Error Encountered')
-      })
 
-    // const nftContract = new web3.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS)
-    const escrowContract = new web3.eth.Contract(
-      ESCROW_CONTRACT_ABI,
-      ESCROW_CONTRACT_ADDRESS
-    )
-    await escrowContract.methods
-      .createAuction(id, duration, price)
-      .send({
-        from: address
-        // gas: 23000
-      })
-      .on('transactionHash', function () {
-        console.log('Transaction Processing............')
-      })
-      .on('receipt', function () {
-        console.log('Reciept')
-      })
-      .on('confirmation', function () {
-        console.log('Transaction Confirmed')
-      })
-      .on('error', async function () {
-        console.log('Error Encountered')
-      })
-  } else {
-    alert(
-      "Please Install MetaMask: 'https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn'"
-    )
-  }
-}
+export default function AuctionModal() {
+  const { id } = useParams();
 
-export default class AuctionModal extends Component {
-  state = { tokenId: '', price: '', duration: '',hightbid:"",base_price:"",
-  bidEndTime:"",Seconds:"",Days_here:"",Hours_here:"",Munits_here:"",img_url:"",setdisable:"true"}
- 
+  const [tokenId, settokenId] = useState()
+  const [price, setprice] = useState()
+  const [duration, setduration] = useState()
+  const [nftcontactadd, setnftcontactadd] = useState()
 
-  handleChange = e => this.setState({ tokenId: e.target.value })
-  handleChange2 = e => this.setState({ price: e.target.value })
-  handleChange3 = e => this.setState({ duration: e.target.value })
 
-  auction = async () => {
+  const [hightbid, sethightbid] = useState()
+
+  const [base_price, setbase_price] = useState()
+  const [bidEndTime, setbidEndTime] = useState()
+  const [Seconds, setSeconds] = useState(0)
+  const [Days_here, setDays_here] = useState( 0)
+  const [Hours_here, setHours_here] = useState(0)
+  const [Munits_here, setMunits_here] = useState(0)
+  const [img_url, setimg_url] = useState()
+  const [setdisable, setsetdisable] = useState()
+  const [getinputdata, setgetinputdata] = useState()
+  const [boluher, setboluher] = useState(true)
+
+
+
+
+
+let alldata_here
+
+  const auction = async () => {
     const web3 = window.web3;
-    let acc =loadWeb3()
+    let acc = loadWeb3()
 
 
-    let  a=this.props.id;
-    a=a.idx
-    console.log("dta",a)
-    const res = await axios.get(
-      `https://wire-nft.herokuapp.com/get_auctions_list`
+    console.log("dta", id)
+    let res = await axios.get(
+      `https://whenftapi.herokuapp.com/OnAuction_marketplace_history?id=100`
     );
 
-  
-    console.log("tayyabjerejj",res.data.data[a]  );
-    let alldata_here=res.data.data[a]
-    alldata_here=alldata_here.itemId;
-    let base_price=res.data.data[a]
-    base_price=base_price.price
-    let bidEndTime=res.data.data[a]
-    bidEndTime=bidEndTime.bidEndTime
+
+    console.log("tayyabjerejj", res.data.data[id]);
+     alldata_here = res.data.data[id]
+    alldata_here = alldata_here.itemId;
+    let base_price = res.data.data[id]
+    base_price = base_price.price
+    let bidEndTime = res.data.data[id]
+    bidEndTime = bidEndTime.bidEndTime   
+    let nftContract = res.data.data[id]
+    nftContract = nftContract.nftContract
+    setbase_price(base_price)
+    settokenId(alldata_here)
+    setnftcontactadd(nftContract)
 
 
     var currentDateTime = new Date();
     let resultInSeconds = currentDateTime.getTime() / 1000;
-    let Time_here =resultInSeconds- 1652679863
-   let TimeFinal = parseInt( 3-Time_here)
-  
-  //  console.log("Time_here",resultInSeconds);
- let {Days_here}=this.state
- let {Hours_here}=this.state
- let {Munits_here}=this.state
+    let Time_here =bidEndTime-resultInSeconds 
+    let TimeFinal = parseInt(Time_here)
 
- let {Seconds}=this.state
- let {setdisable}=this.state
-
-
-
-if(TimeFinal<=0){
-  console.log("Time_here",resultInSeconds);
-
-  this.setState({
-   Days_here:Days_here=0,
-   Hours_here:Hours_here=0,
-   Munits_here:Munits_here=0,
-   Seconds:Seconds=0,
-   setdisable:setdisable="false"
-  })
-
-
-  console.log("setdisable",setdisable);
-
-
-
-}else{
-  Days_here = parseInt(TimeFinal / 86400)
-  TimeFinal = TimeFinal % (86400)
-   Hours_here = parseInt(TimeFinal / 3600)
-  TimeFinal %= 3600
-   Munits_here = parseInt(TimeFinal / 60)
-  TimeFinal %= 60
-   Seconds = parseInt(TimeFinal)
-  //  this.state({
-  //  setdisable:setdisable="true"
-
-  //  })
- 
-}
-    
-
-console.log("Days_here",Munits_here);
-let nftContractOf = new web3.eth.Contract(nftMarketContractAddress_Abi, nftMarketContractAddress);
-
-let hightbid= await nftContractOf.methods.highestBidderMapping(alldata_here).call(); 
-this.setState({
-  liveAuctions: res.data.data[a],
-  currentLoad: res.data.data.length > 8 ? 8 : res.data.data.length,
-  hightbid:hightbid,
-  base_price:base_price,
-  bidEndTime:bidEndTime,
-  Days_here:Days_here,
-  Hours_here:Hours_here,
-  Munits_here:Munits_here,
-  Seconds:Seconds
-
-});
+    //  console.log("TimeFinal",TimeFinal);
    
-    return res;
-  };
+    // let { Days_here } = this.state
+    // let { Hours_here } = this.state
+    // let { Munits_here } = this.state
 
-  componentDidMount() {
-    this._isMounted = 1;
-    // this.setState({
-    //   initData: initData,
-    //   data: data,
-    // });
+    // let { Seconds } = this.state
+    // let { setdisable } = this.state
 
-    // this.fetchNFTs();
-    // this.getLiveAuction();
-    this.auction();
-  }
 
-  render() {
-    // console.log("hightbid",this.state.setdisable)
-    let { hightbid } = this.state;
-    let {base_price}=this.state;
-    let {bidEndTime}=this.state;
-    let {Days_here}=this.state
-    let {Hours_here}=this.state
 
-    let {Munits_here}=this.state
-
-    let {Seconds}=this.state
-    let {setdisable}=this.state
-
+    if (TimeFinal <= 0) {
    
 
-
-
-
-
-
-    const createBidOnItem = async () => {
-      try{
-        const web3 = window.web3;
-        console.log("liveAuctionsliveAuctions",bidEndTime)
-
-        let price=this.state.price
-        price=web3.utils.toWei(price)
-        if(hightbid.amount && base_price>price){
-          let liveAuctions=this.state.liveAuctions
-          let itemId=liveAuctions.itemId
-          let owner= liveAuctions.owner
-          let nftContract= liveAuctions.nftContract
-         
-          let acc = await loadWeb3();
-          console.log("itemId",itemId)
-    
-          console.log("itemId",nftContract)
-    
-          let nftContractOf = new web3.eth.Contract(nftMarketContractAddress_Abi, nftMarketContractAddress);
-    
-          await nftContractOf.methods.createBidOnItem(itemId,nftContract).send({
-            from: acc,
-            value:price
-            
-          })
-          toast.success("Biding Successful")
-        }else{
-          toast.error("Bid price must be greater than base price and highest bid")
-        }
-       
-      }
-      catch(e){
-        console.log("Create Bid Error",e);
-      }
+      setboluher(false)
+    } else {
+      let days = parseInt(TimeFinal/86400)
+     
+      setDays_here(days)
+      TimeFinal = TimeFinal % (86400)
+      let hours = parseInt(TimeFinal / 3600)
+      setHours_here(hours)
+      TimeFinal %= 3600
+      let munites = parseInt(TimeFinal / 60)
+      setMunits_here(munites)
+      TimeFinal %= 60
+      let second_here = parseInt(TimeFinal)
+      setSeconds(second_here)
      
     }
 
+    console.log("Days_here", alldata_here);
+    try{
+      let nftContractOf = new web3.eth.Contract(nftMarketContractAddress_Abi, nftMarketContractAddress);
+      console.log("tokenId",alldata_here);
+      let hightbid = await nftContractOf.methods.highestBidderMapping(79).call();
+      console.log("hightbid",hightbid.amount);
+      hightbid=hightbid.amount;
+      sethightbid(hightbid)
+
+    }catch(e){
+      console.log("Error While HeightestBid",e);
+    }
 
 
+   
+  };
 
+  const heightestbid=async()=>{
+    const web3 = window.web3;
 
-
-    return (
-      <Modal
-        centered
-        size='lg'
-        show={this.props.isOpen}
-        onHide={this.props.closeModal}
-        // id={this.props.id}
-      >
-        <Modal.Header closeButton className='text-white'>
-
-          <Modal.Title > Auction <span>{console.log("datataaaaaa",this.state.hightbid.amount)}</span></Modal.Title>
- 
-         
-        </Modal.Header>
-        <Modal.Body style={{ padding: '20px' }}>
-          <Form.Group style={{ padding: '10px' }}>
-            <Form.Label style={{ margin: '10px' }}>Reserve Price: 
-            
-     
-              </Form.Label>
-            <Form.Control
-              type='text'
-              onChange={this.handleChange2}
-              value={this.state.price}
-              id='price'
-              placeholder='Enter reserve price in Ethers'
-            />
-          </Form.Group>
-          {/* <Form.Group style={{ padding: '10px' }}>
-            <Form.Label style={{ margin: '10px' }}>Duration:</Form.Label>
-            <Form.Control
-              type='text'
-              onChange={this.handleChange3}
-              value={this.state.duration}
-              id='duration'
-              placeholder='Enter duration in Hours'
-            />
-          </Form.Group> */}
-
-          {
-            console.log("bodyhere",setdisable)
-          }
-          
-          <p className='timer_here'>CLAIM IN {Days_here} <small>d </small>{Hours_here} <small>h</small> {Munits_here} <small>m</small> {Seconds} <small>s</small></p>
-          <button className='btn mt-2' disabled={setdisable}>Claim on Bid</button>
-
-        <p className='top_martg'> <span className='text-white'>Highest Bid:</span> {hightbid.amount}</p>
-
-        </Modal.Body>
-        <Modal.Footer>
-          {/* <Button
-            variant="primary"
-            type="submit"
-            onClick={() => this.props.closeModal()}
-          >
-            Create Auction
-          </Button> */}
-          <button
-            className='btn'
-            type='submit'
-            // style={{ color: 'black', background: 'white', border: 'none' }}
-          onClick={()=>createBidOnItem()}
-          >
-            Create Auction
-          </button>
-        </Modal.Footer>
-      </Modal>
-    )
+   
   }
+
+  const createBidOnItem = async () => {
+    try {
+      const web3 = window.web3;
+      getinputdata = web3.utils.toWei(getinputdata)
+      if (hightbid && base_price > getinputdata) {
+        
+
+        let acc = await loadWeb3();
+    
+
+     
+
+        let nftContractOf = new web3.eth.Contract(nftMarketContractAddress_Abi, nftMarketContractAddress);
+
+        await nftContractOf.methods.createBidOnItem(tokenId, nftcontactadd).send({
+          from: acc,
+          value: getinputdata
+
+        })
+        toast.success("Biding Successful")
+      } else {
+        toast.error("Bid price must be greater than base price and highest bid")
+      }
+
+    }
+    catch (e) {
+      console.log("Create Bid Error", e);
+    }
+  }
+  
+  useEffect(() => {
+
+    auction()
+    heightestbid()
+  }, [])
+
+
+  return (
+    <div>
+
+      <section className="mt-4 item-details-area">
+        <div className="container">
+
+
+
+          <div className="row justify-content-between">
+            <div className="col-12 col-lg-6">
+              <div className="content mt-5 mt-lg-0">
+             
+                <div className="row items">
+                  <div className="col-12 item  p-2">
+                   
+                   
+                    <div className="card no-hover px-5 ">
+                      <div className="single-seller ">
+                        <div className="seller-info mt-3">
+
+                        
+                          <div className='timer_here'>
+                            <p > Highest Bid:{hightbid}</p>
+                            {
+                              boluher ? (<>
+                            <p className='mt-n1'>CLAIM IN {Days_here} <small>d </small>{Hours_here} <small>h</small> {Munits_here} <small>m</small> {Seconds} <small>s</small></p>
+
+                              </>):
+                              (
+                                <>
+                              <span>End Time</span>
+                                
+                                </>
+                              )
+                            }
+                          
+
+                          </div>
+
+                        </div>
+                       
+                      </div>
+
+                      {
+                         boluher ? (
+
+                          <>
+                           <input
+                          type="text"
+                          placeholder="Enter Bid Value in ETH"
+                          className="d-block btn btn-bordered-white mt-4 "
+                          id="bid"
+                          onChange={(e) => setgetinputdata(e.target.value)}
+                         
+
+                        />
+                      <button className='btn my-4 form-control btn-lg' style={{ padding: '25px 25px 35px 25px' }}
+                      onClick={() => createBidOnItem()} 
+                      >
+                      Make Offer</button>
+                          
+                          </>
+                         ):(<>
+                    <button className='btn mt-2' disabled={setdisable}>Claim on Bid</button>
+                         
+                         </>)
+
+                      }
+                     
+                    </div>
+                  </div>
+
+
+                  <div className="col-12 item px-lg-2">
+                  </div>
+
+                </div>
+              </div>
+
+            </div>
+            <div className="col-12 col-lg-5">
+              <div className="item-info">
+                <div className=" p-4 item-thumb text-center">
+
+
+                  {/* <img src="placeholder-image.png" alt="Avatar"
+                    style={{ width: "400px", height: "400px" }}
+
+
+                  /> */}
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+
+
+
+
+        </div>
+      </section >
+
+      <Footer />
+    </div >
+  )
 }
+
+
+
+

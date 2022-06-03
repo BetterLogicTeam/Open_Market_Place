@@ -7,13 +7,13 @@ color: aliceblue !important;
 }
 
 .top_martg{
-    margin-top: -9rem;
-    margin-left: 0rem;
+    /* margin-top: -9rem;
+    margin-left: 0rem; */
 }
 
 .timer_here{
-    margin-top: -7.5rem;
-    margin-left: 0rem;
+   display: flex;
+   justify-content:space-between;
 }
 
 .inner_div_model{

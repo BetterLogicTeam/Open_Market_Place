@@ -34,6 +34,8 @@ export default function Auctionsbiding() {
 
   let [tokenid, settoken_id] = useState();
   let [ownadd, setownadd] = useState();
+  let [NftName, setNftName] = useState()
+
 
   const inputdata_price = useRef();
 
@@ -92,7 +94,7 @@ export default function Auctionsbiding() {
     let symbol = res.symbol;
     token_id = res.token_id;
     let img_url = res_here.config.url;
-
+    setNftName(name)
     settoken_id(token_id);
     setownadd(token_address);
     // console.log("token_id", token_address);
@@ -140,103 +142,102 @@ export default function Auctionsbiding() {
         let address = "0x4113ccD05D440f9580d55B2B34C92d6cC82eAB3c";
         let value_price = inputdata_price.current.value;
         let selecthere = selectoption.current.value;
-       
+
 
         console.log("ownaddress", value_price);
-if(value_price==" "){
-  toast.error("Please enter the value")
-}else{
-        // if (current_time_and_days > curreny_time) {
-        // }
+        if (value_price == " ") {
+          toast.error("Please enter the value")
+        } else {
+          // if (current_time_and_days > curreny_time) {
+          // }
 
-        if(selecthere<=0){
-          toast.error("Please Select the Days")
-        }else{
+          if (selecthere <= 0) {
+            toast.error("Please Select the Days")
+          } else {
 
-        
-        value_price = web3.utils.toWei(value_price);
-        let curreny_time = Math.floor(new Date().getTime() / 1000.0);
-        let current_time_and_days = 86400 * selecthere;
-        current_time_and_days = current_time_and_days + curreny_time;
 
-        console.log("selecthere", current_time_and_days);
-        console.log("current_time_and_days", current_time_and_days);
-        console.log("curreny_time", curreny_time);
-        let nftContractOftoken = new web3.eth.Contract(
-          nftMarketToken_Abi,
-          ownadd
-        );
-        let nftContractInstance = new web3.eth.Contract(
-          nftMarketContractAddress_Abi,
-          nftMarketContractAddress
-        );
-        const getItemId = await nftContractInstance.methods
-          .tokenIdToItemId(ownadd, tokenid)
-          .call();
+            value_price = web3.utils.toWei(value_price);
+            let curreny_time = Math.floor(new Date().getTime() / 1000.0);
+            let current_time_and_days = 60 * selecthere;
+            current_time_and_days = current_time_and_days + curreny_time;
 
-        console.log("tokenIdToItemId", getItemId);
+            console.log("selecthere", current_time_and_days);
+            console.log("current_time_and_days", current_time_and_days);
+            console.log("curreny_time", curreny_time);
+            let nftContractOftoken = new web3.eth.Contract(nftMarketToken_Abi, ownadd);
+            let nftContractInstance = new web3.eth.Contract(nftMarketContractAddress_Abi, nftMarketContractAddress);
+            // const getItemId = await nftContractInstance.methods.tokenIdToItemId(ownadd, tokenid).call();
 
-        let getListingPrice = await nftContractInstance.methods
-          .getListingPrice()
-          .call();
+            // console.log("tokenIdToItemId", getItemId);
 
-        await nftContractOftoken.methods
-          .setApprovalForAll(nftMarketContractAddress, true)
-          .send({
-            from: acc,
-          })
-          .then(() => {
-            let getItemId = nftContractInstance.methods
-              .tokenIdToItemId(ownadd, tokenid)
-              .call();
-            const polygRes = nftContractInstance.methods
-              .idToMarketItem(getItemId)
-              .call();
-            toast.success("Approved Successfuly");
-          })
-          .catch((error) => {
-            console.error("onRejected function called: " + error.message);
-          });
+            let getListingPrice = await nftContractInstance.methods.getListingPrice().call();
 
-        let nftContractOf = new web3.eth.Contract(
-          nftMarketContractAddress_Abi,
-          nftMarketContractAddress
-        );
+            await nftContractOftoken.methods.setApprovalForAll(nftMarketContractAddress, true).send({
+              from: acc,
+            })
 
-        await nftContractOf.methods
-          .createMarketItem(
-            tokenid,
-            value_price,
-            1,
-            true,
-            current_time_and_days,
-            ownadd
-          )
-          .send({
-            from: acc,
-            value: getListingPrice,
-          });
 
-        const getAll = await nftContractOf.methods.idToMarketItem(getItemId).call();
-        console.log("getAll", getAll);
-        await axios.post(`https://wire-nft.herokuapp.com/save_auction`, {
-            itemId: getAll.itemId.toString(),
-            tokenId: getAll.tokenId.toString(),
-            bidEndTime: getAll.bidEndTime,
-            isOnAuction: getAll.isOnAuction,
-            sold: getAll.sold,
-            nftContract: getAll.nftContract.toString(),
-            owner: getAll.owner.toString(),
-            price: getAll.price.toString(),
-          })
-          .then((response) => {
-            console.log(response, "...ssssss");
-            toast.success("Approved Successfuly");
-          })
-          .catch((error) => {
-            console.log(error, "..eeeeee");
-          });
-        }
+            let nftContractOf = new web3.eth.Contract(nftMarketContractAddress_Abi, nftMarketContractAddress);
+
+           let hash= await nftContractOf.methods.createMarketItem(tokenid, value_price, 1, true, current_time_and_days, ownadd).send({
+              from: acc,
+              value: getListingPrice,
+            });
+            hash = hash.transactionHash
+            console.log("hash", hash);
+            // setIsSpinner(false)
+            toast.success("Transion Compelete")
+            let getItemId = await nftContractOf.methods.tokenIdToItemId(ownadd, tokenid).call();
+            let MarketItemId = await nftContractOf.methods.idToMarketItem(getItemId).call();
+            console.log("MarketItemId", MarketItemId)
+            let bidEndTime = MarketItemId.bidEndTime;
+            let isOnAuction = MarketItemId.isOnAuction;
+            let itemId = MarketItemId.itemId;
+            let nftContract = MarketItemId.nftContract;
+            let owner = MarketItemId.owner;
+            let price = MarketItemId.price;
+            let seller = MarketItemId.seller;
+            let sold = MarketItemId.sold;
+            let tokenId = MarketItemId.tokenId;
+
+            price = web3.utils.fromWei(price)
+            let postapiPushdata = await axios.post('https://whenftapi.herokuapp.com/open_marketplace', {
+              "useraddress": acc,
+              "itemId": itemId,
+              "nftContract": nftContract,
+              "tokenId": tokenId,
+              "owner": owner,
+              "price": price,
+              "sold": sold,
+              "isOnAuction": isOnAuction,
+              "bidEndTime": bidEndTime,
+              "name": NftName,
+              "url": "Image_url",
+              "txn": hash
+            })
+
+            console.log("postapiPushdata", postapiPushdata);
+            toast.success("Success")
+            // const getAll = await nftContractOf.methods.idToMarketItem(getItemId).call();
+            // console.log("getAll", getAll);
+            // await axios.post(`https://wire-nft.herokuapp.com/save_auction`, {
+            //   itemId: getAll.itemId.toString(),
+            //   tokenId: getAll.tokenId.toString(),
+            //   bidEndTime: getAll.bidEndTime,
+            //   isOnAuction: getAll.isOnAuction,
+            //   sold: getAll.sold,
+            //   nftContract: getAll.nftContract.toString(),
+            //   owner: getAll.owner.toString(),
+            //   price: getAll.price.toString(),
+            // })
+            //   .then((response) => {
+            //     console.log(response, "...ssssss");
+            //     toast.success("Approved Successfuly");
+            //   })
+            //   .catch((error) => {
+            //     console.log(error, "..eeeeee");
+            //   });
+          }
         }
         // toast.success("Transion Compelete");
       } catch (e) {
@@ -248,7 +249,7 @@ if(value_price==" "){
   useEffect(() => {
     if (isInitialized) {
       fetchNFTs();
-    
+
     }
   }, [isInitialized]);
 
@@ -301,13 +302,13 @@ if(value_price==" "){
                               Select Days
                             </option>
                             <option value="1" class="dropdown__select">
-                             
-                              1 Day
+
+                              1 Munites
                             </option>
-                            <option value="3"> 3 Days</option>
-                            <option value="7"> 7 Days</option>
-                            <option value="90"> 3 Months</option>
-                            <option value="180"> 6 Months</option>
+                            <option value="2"> 2 Munites</option>
+                            <option value="5"> 5 Munites</option>
+                            <option value="10"> 10 Munites</option>
+                            <option value="15"> 15 Munites</option>
                           </select>
                         </div>
 
@@ -344,7 +345,7 @@ if(value_price==" "){
         </div>
       </section>
 
-      <Footer/>
+      <Footer />
     </div>
   );
 }

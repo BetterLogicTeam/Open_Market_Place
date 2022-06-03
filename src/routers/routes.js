@@ -33,6 +33,7 @@ import My_Collection from "../components/My_Collections/My_Collection";
 import Sellmain from "../components/Sell/Sellmain";
 import Purchase from "../components/Explore/Purchase";
 import Auctionsbiding from "../components/Authors/Auctionsbiding";
+import AuctionModal from "../components/Auctions/AuctionModal";
 
 
 
@@ -74,8 +75,9 @@ class MyRouts extends React.Component {
               )}
             />
             <Route exact path='/Auctionsbide/:id' component={Auctionsbiding} />
+            <Route exact path='/AuctionModal/:id' component={AuctionModal} />
 
-            <Route exact path='/purchase' component={Purchase} />
+            <Route exact path='/purchase/:id' component={Purchase} />
             <Route exact path="/explore-1" component={ExploreOne} />
             <Route exact path="/explore-2" component={ExploreTwo} />
             <Route exact path="/explore-3" component={ExploreThree} />

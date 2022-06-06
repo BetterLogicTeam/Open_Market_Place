@@ -28,7 +28,7 @@ export default function ExploreFour() {
 
   const { isInitialized, authenticate, isAuthenticated, user, initialize } = useMoralis()
   const { nft_details } = useSelector((state) => state.nft)
-  let id = 1006;
+
   let myHistory = useHistory();
   const dispatch = useDispatch();
 
@@ -57,7 +57,7 @@ export default function ExploreFour() {
   useEffect(() => {
 
     Fatch_Api_data()
-    dispatch(pendingOrder(id));
+
 
   }, []);
 

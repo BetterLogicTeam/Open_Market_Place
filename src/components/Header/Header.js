@@ -478,7 +478,7 @@ const Header = (props) => {
                   src={userData?.Image || "/static/images/avatar/1.jpg"}
                 />
           </a>
-          <ul class="dropdown-menu"  aria-labelledby="navbarScrollingDropdown">
+          <ul class="dropdown-menu dropdown_here"  aria-labelledby="navbarScrollingDropdown">
             <li  onClick={() => {
                   history.push("/user-profile");
                 }} ><a class="dropdown-item" href="#">Profile</a></li>

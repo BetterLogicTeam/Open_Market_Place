@@ -14,3 +14,15 @@
 .toggle{
     display: none;
 }
+
+.dropdown_here{
+    background-color: #16151A;
+}
+.dropdown_here li a{
+    color: white !important;
+
+}
+.dropdown_here li a:hover{
+    background-color: #000 !important;
+
+}

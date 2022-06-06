@@ -16,6 +16,12 @@ import axios from 'axios'
 import { toast } from "react-toastify";
 import { useParams, useHistory } from "react-router-dom";
 import Footer from '../Footer/Footer'
+import { MdLocalOffer, MdAccountBalanceWallet } from 'react-icons/md'
+import { BiTransfer } from 'react-icons/bi'
+
+import women_drink from '../././../Assets/women_drink.jpg'
+import Loading from '../Loading/Loading'
+
 
 
 
@@ -27,47 +33,53 @@ export default function AuctionModal() {
   const [price, setprice] = useState()
   const [duration, setduration] = useState()
   const [nftcontactadd, setnftcontactadd] = useState()
-
-
   const [hightbid, sethightbid] = useState()
-
   const [base_price, setbase_price] = useState()
   const [bidEndTime, setbidEndTime] = useState()
   const [Seconds, setSeconds] = useState(0)
-  const [Days_here, setDays_here] = useState( 0)
+  const [Days_here, setDays_here] = useState(0)
   const [Hours_here, setHours_here] = useState(0)
   const [Munits_here, setMunits_here] = useState(0)
   const [img_url, setimg_url] = useState()
   const [setdisable, setsetdisable] = useState()
   const [getinputdata, setgetinputdata] = useState()
   const [boluher, setboluher] = useState(true)
+  const [SendAddress, setSendAddress] = useState()
+  const [HighestBideradd, setHighestBideradd] = useState()
+  let [isSpinner, setIsSpinner] = useState(false)
 
 
 
 
 
-let alldata_here
+
+
+  let alldata_here
 
   const auction = async () => {
     const web3 = window.web3;
     let acc = loadWeb3()
 
 
-    console.log("dta", id)
+
     let res = await axios.get(
       `https://whenftapi.herokuapp.com/OnAuction_marketplace_history?id=100`
     );
 
+    let sender_address = res.data.data[id]
+    sender_address = sender_address.useraddress
+    setSendAddress(sender_address)
 
-    console.log("tayyabjerejj", res.data.data[id]);
-     alldata_here = res.data.data[id]
+
+    alldata_here = res.data.data[id]
     alldata_here = alldata_here.itemId;
     let base_price = res.data.data[id]
     base_price = base_price.price
     let bidEndTime = res.data.data[id]
-    bidEndTime = bidEndTime.bidEndTime   
+    bidEndTime = bidEndTime.bidEndTime
     let nftContract = res.data.data[id]
     nftContract = nftContract.nftContract
+
     setbase_price(base_price)
     settokenId(alldata_here)
     setnftcontactadd(nftContract)
@@ -75,27 +87,20 @@ let alldata_here
 
     var currentDateTime = new Date();
     let resultInSeconds = currentDateTime.getTime() / 1000;
-    let Time_here =bidEndTime-resultInSeconds 
+    let Time_here = bidEndTime - resultInSeconds
     let TimeFinal = parseInt(Time_here)
 
-    //  console.log("TimeFinal",TimeFinal);
-   
-    // let { Days_here } = this.state
-    // let { Hours_here } = this.state
-    // let { Munits_here } = this.state
 
-    // let { Seconds } = this.state
-    // let { setdisable } = this.state
 
 
 
     if (TimeFinal <= 0) {
-   
+
 
       setboluher(false)
     } else {
-      let days = parseInt(TimeFinal/86400)
-     
+      let days = parseInt(TimeFinal / 86400)
+
       setDays_here(days)
       TimeFinal = TimeFinal % (86400)
       let hours = parseInt(TimeFinal / 3600)
@@ -106,66 +111,139 @@ let alldata_here
       TimeFinal %= 60
       let second_here = parseInt(TimeFinal)
       setSeconds(second_here)
-     
+
     }
 
-    console.log("Days_here", alldata_here);
-    try{
+    // console.log("Days_here", alldata_here);
+    try {
       let nftContractOf = new web3.eth.Contract(nftMarketContractAddress_Abi, nftMarketContractAddress);
-      console.log("tokenId",alldata_here);
-      let hightbid = await nftContractOf.methods.highestBidderMapping(79).call();
-      console.log("hightbid",hightbid.amount);
-      hightbid=hightbid.amount;
+      // console.log("tokenId",alldata_here);
+      let hightbid = await nftContractOf.methods.highestBidderMapping(alldata_here).call();
+      console.log("hightbid", hightbid.bidderAddr);
+      let bidderAdd = hightbid.bidderAddr
+      hightbid = hightbid.amount;
+      hightbid = web3.utils.fromWei(hightbid)
+      setHighestBideradd(bidderAdd)
+
       sethightbid(hightbid)
 
-    }catch(e){
-      console.log("Error While HeightestBid",e);
+    } catch (e) {
+      console.log("Error While HeightestBid", e);
     }
 
 
-   
+
   };
 
-  const heightestbid=async()=>{
+  const heightestbid = async () => {
     const web3 = window.web3;
 
-   
+
   }
 
+
+
   const createBidOnItem = async () => {
+    let acc = await loadWeb3();
+    setIsSpinner(true)
+
     try {
       const web3 = window.web3;
-      getinputdata = web3.utils.toWei(getinputdata)
-      if (hightbid && base_price > getinputdata) {
-        
+      // hightbid = web3.utils.toWei(hightbid)
+      // console.log("getinputdata",getinputdata);
+      if (SendAddress !== acc) {
+        if (hightbid <= getinputdata) {
+          if (base_price <= getinputdata) {
+            // let getinputdata2 = web3.utils.toBN(getinputdata).toString()
+            let getinputdata2 = web3.utils.toWei(getinputdata).toString()
 
-        let acc = await loadWeb3();
-    
 
-     
 
-        let nftContractOf = new web3.eth.Contract(nftMarketContractAddress_Abi, nftMarketContractAddress);
 
-        await nftContractOf.methods.createBidOnItem(tokenId, nftcontactadd).send({
-          from: acc,
-          value: getinputdata
+            // getinputdata=getinputdata.parseInt()
+            console.log("getinputdata", getinputdata2);
 
-        })
-        toast.success("Biding Successful")
+
+            let nftContractOf = new web3.eth.Contract(nftMarketContractAddress_Abi, nftMarketContractAddress);
+
+            await nftContractOf.methods.createBidOnItem(tokenId, nftcontactadd).send({
+              from: acc,
+              value: getinputdata2
+
+            })
+            toast.success("Biding Successful")
+            setgetinputdata(" ")
+            setIsSpinner(false)
+
+          } else {
+            toast.error("Bid price must be greater than base price and highest bid")
+            setIsSpinner(false)
+
+          }
+
+
+        } else {
+          toast.error("Bid price must be greater than base price and highest bid")
+          setIsSpinner(false)
+
+        }
       } else {
-        toast.error("Bid price must be greater than base price and highest bid")
+        toast.error("Already owned")
+        setIsSpinner(false)
+
+
       }
+
 
     }
     catch (e) {
       console.log("Create Bid Error", e);
+      setIsSpinner(false)
+
     }
   }
-  
-  useEffect(() => {
 
-    auction()
-    heightestbid()
+
+  const claimBidItem = async () => {
+    let acc = await loadWeb3();
+    const web3 = window.web3;
+    setIsSpinner(true)
+
+
+    try {
+      if (HighestBideradd == acc) {
+        let nftContractOf = new web3.eth.Contract(nftMarketContractAddress_Abi, nftMarketContractAddress);
+        
+
+        await nftContractOf.methods.claimBidItem(tokenId, nftcontactadd).send({
+          from: acc,
+        })
+        setIsSpinner(false)
+        toast.success("Transion Compelete")
+
+
+      } else {
+        toast.error("Only highest bidder can claim the NFT")
+        setIsSpinner(false)
+
+      }
+
+
+
+    } catch (e) {
+      console.log("Error While Call Function claimBidItem", e)
+      setIsSpinner(false)
+
+    }
+  }
+
+  useEffect(() => {
+    setInterval(() => {
+      auction()
+      heightestbid()
+    }, 1000)
+
+
   }, [])
 
 
@@ -175,69 +253,72 @@ let alldata_here
       <section className="mt-4 item-details-area">
         <div className="container">
 
+          {
+            isSpinner ? <Loading /> : <></>
 
+          }
 
           <div className="row justify-content-between">
             <div className="col-12 col-lg-6">
               <div className="content mt-5 mt-lg-0">
-             
+
                 <div className="row items">
                   <div className="col-12 item  p-2">
-                   
-                   
+
+
                     <div className="card no-hover px-5 ">
                       <div className="single-seller ">
                         <div className="seller-info mt-3">
 
-                        
+
                           <div className='timer_here'>
                             <p > Highest Bid:{hightbid}</p>
                             {
                               boluher ? (<>
-                            <p className='mt-n1'>CLAIM IN {Days_here} <small>d </small>{Hours_here} <small>h</small> {Munits_here} <small>m</small> {Seconds} <small>s</small></p>
+                                <p className='mt-n1'>CLAIM IN {Days_here} <small>d </small>{Hours_here} <small>h</small> {Munits_here} <small>m</small> {Seconds} <small>s</small></p>
 
-                              </>):
-                              (
-                                <>
-                              <span>End Time</span>
-                                
-                                </>
-                              )
+                              </>) :
+                                (
+                                  <>
+                                    <span>End Time</span>
+
+                                  </>
+                                )
                             }
-                          
+
 
                           </div>
 
                         </div>
-                       
+
                       </div>
 
                       {
-                         boluher ? (
+                        boluher ? (
 
                           <>
-                           <input
-                          type="text"
-                          placeholder="Enter Bid Value in ETH"
-                          className="d-block btn btn-bordered-white mt-4 "
-                          id="bid"
-                          onChange={(e) => setgetinputdata(e.target.value)}
-                         
+                            <input
+                              type="text"
+                              placeholder="Enter Bid Value in ETH"
+                              className="d-block btn btn-bordered-white mt-4 "
+                              id="bid"
+                              onChange={(e) => setgetinputdata(e.target.value)}
 
-                        />
-                      <button className='btn my-4 form-control btn-lg' style={{ padding: '25px 25px 35px 25px' }}
-                      onClick={() => createBidOnItem()} 
-                      >
-                      Make Offer</button>
-                          
+
+                            />
+                            <button className='btn my-4 form-control btn-lg' style={{ padding: '25px 25px 35px 25px' }}
+                              onClick={() => createBidOnItem()}
+                            >
+                              <MdLocalOffer />  Place Bid</button>
+
                           </>
-                         ):(<>
-                    <button className='btn mt-2' disabled={setdisable}>Claim on Bid</button>
-                         
-                         </>)
+                        ) : (<>
+                          <button className='btn  form-control btn-lg' onClick={() => claimBidItem()} style={{ padding: '15px 25px 40px 25px' }}><BiTransfer className='fs-3 ms-1' /> Claim On Bid</button>
+
+                        </>)
 
                       }
-                     
+
                     </div>
                   </div>
 
@@ -254,11 +335,11 @@ let alldata_here
                 <div className=" p-4 item-thumb text-center">
 
 
-                  {/* <img src="placeholder-image.png" alt="Avatar"
-                    style={{ width: "400px", height: "400px" }}
+                  <img src={women_drink} alt="Avatar"
+                    style={{ width: "400px", height: "400px", zIndex: '2' }}
 
 
-                  /> */}
+                  />
 
                 </div>
               </div>

@@ -1,158 +1,48 @@
 import React, { Component, useState, useEffect } from "react";
 import axios from "axios";
-import { withRouter } from "react-router";
+import { useHistory, withRouter } from "react-router";
 import SaleModal from "./SaleModal.js";
 
-const BASE_URL =
-  "https://my-json-server.typicode.com/themeland/netstorm-json/collections";
 
-const NftView = ({ src }) => {
-  const [img, setImg] = useState();
-  const loadMedia = (src) => {
-    setImg(true);
-    var img = new Image();
-    img.onerror = () => {
-      console.log(src);
-      setImg(false);
-    };
-    img.src = src;
-  };
+export default function Collections() {
+  const [apiData, setapiData] = useState()
+  let myHistory = useHistory();
+  
+  const Fatch_Api_data = async () => {
+    try {
+
+      let res = await axios.get("https://whenftapi.herokuapp.com/sell_marketplace_history?id=100")
+      console.log("res", res.data.data);
+      res = res.data.data
+      console.log("Data",res.name);
+      setapiData(res)
+
+
+
+    } catch (e) {
+      console.log("Error while fatching API ", e);
+    }
+  }
+
+
+
+
+
+
+
+
   useEffect(() => {
-    loadMedia(src);
-    console.log(img);
+
+    Fatch_Api_data()
+
+
   }, []);
 
   return (
-    <img
-      style={{ height: "200px", width: "300px" }}
-      className="card-img-top"
-      src={src}
-      alt=""
-    />
-  );
-};
 
-class Collections extends Component {
-  _isMounted = 1;
 
-  state = {
-    data: {},
-    collectionData: [],
-    liveSale: [],
-    ImgUri: [],
-    nftImage: "",
-    source: [],
-    isOpen: false,
-  };
-  openModal = () => this.setState({ isOpen: true });
-  closeModal = () => {
-    console.log("ok");
-    this.setState({ isOpen: false }, () => {
-      console.log(this.state.isOpen);
-    });
-  };
-  handleSubmit = (tokenId, price) => {
-    console.log(tokenId);
-    console.log(price);
-  };
-
-  fetchImageObject = async () => {
-    try {
-      if (this._isMounted === 1) {
-        this.state.liveSale?.forEach((nft) =>
-          axios
-            .get(`https://gateway.pinata.cloud/ipfs/${nft.token.uri}`)
-            .then((resp) =>
-              this.setState({
-                source: {
-                  ...this.state.source,
-                  [nft.id]: `https://ipfs.io/ipfs/${resp.data.url}`,
-                },
-              })
-            )
-        );
-      }
-
-      if (this._isMounted === 1) {
-        this.setState(() => ({
-          isLoaded: true,
-        }));
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  getliveSale = async () => {
-    const query = `
-    {
-      sales (where:{status:OPEN}){
-        id
-        token {
-          id
-          uri
-        }
-        
-        price
-        owner
-        buyer
-        status
-        saleCreatedAt
-        saleEndedAt
-        txnHash
-      }
-    }`;
-    try {
-      const res = await axios.post(
-        "https://api.thegraph.com/subgraphs/name/vjbhandari61/saimart",
-        {
-          query,
-        }
-      );
-      if (this._isMounted === 1) {
-        this.setState(
-          {
-            isLoaded: true,
-            liveSale: res.data.data.sales,
-          },
-          () => {
-            this.fetchImageObject();
-          }
-        );
-      }
-    } catch (error) {
-      this.setState(() => ({ error }));
-      console.log(error);
-    }
-  };
-
-  componentDidMount() {
-    axios
-      .get(`${BASE_URL}`)
-      .then((res) => {
-        this.setState({
-          data: res.data,
-          collectionData: res.data.collectionData,
-        });
-        // console.log(this.state.data)
-      })
-      .catch((err) => console.log(err));
-    this._isMounted = 1;
-    this.fetchImageObject();
-
-    this.getliveSale();
-  }
-  componentWillUnmount() {
-    this._isMounted = 0;
-    this.setState = (state, callback) => {
-      return;
-    };
-  }
-  render() {
-    var { source } = this.state;
-
-    return (
-      <section
+    <div>
+       <section
         className="popular-collections-area"
         style={{ marginTop: "15px" }}
       >
@@ -168,72 +58,117 @@ class Collections extends Component {
                   <h3 className="mt-3 mb-0">Live Sale</h3>
                 </div>
                 <div className="intro-btn">
-                  <a href="/allSale" className="btn content-btn text-left">
+                  <a href="/explore-3" className="btn content-btn text-left">
                     View All
                   </a>
                 </div>
               </div>
             </div>
-            <div className="row items">
-              {this.state.liveSale &&
-                !!this.state.liveSale.length &&
-                this.state.liveSale.map((item, idx) => {
-                  return (
-                    <div
-                      style={{ cursor: "pointer" }}
-                      onClick={() =>
-                        this.props.history.push(
-                          `/details/${item.token.id}`,
-                          this.state.data
-                        )
-                      }
-                      key={`cd_${idx}`}
-                      className="col-10 mr-5 col-sm-8 col-lg-3 item"
-                    >
+            <div className="col-12 row-10 mt-3 liveauction-card">
+            <div className="swiper-container slider-mid items">
+              <div className="swiper-wrapper">
+                {/* Single Slide */}
+                {apiData?.map((item, idx) => {
+                    return (
                       <div
-                        style={{
-                          height: "fit-content",
-                          width: "300px",
-                          margin: "40px",
-                        }}
-                        className="card ml-5 no-hover text-center"
+                        onClick={() =>
+                          this.props.history.push(
+                            `/AuctionModal/${idx}`,
+                            this.state.data
+                          )
+                        }
+                        style={{ cursor: "pointer", height: "410px" }}
+                        key={`auc_${idx}`}
+                        className="swiper-slideitem liveauction-card mb-5"
                       >
-                        <div style={{ height: "300px" }} className="image-over">
-                          {/* <NftView src={this.state.source[idx]} /> */}
+                        <div
+                          style={{ cursor: "pointer", width: "350px" }}
+                          className="m-3 card"
+                        >
                           <div
                             style={{
-                              backgroundImage: `url(${
-                                this.state.source[item.id]
-                              })`,
-                              height: "220px",
-                              width: "100%",
-                              minWidth: "220px",
-                              backgroundRepeat: "no-repeat",
-                              backgroundPosition: "center",
-                              backgroundSize: "cover",
+                              overflow: "visible",
+                              // height: "500px",
+                              // width: "350px",
                             }}
-                          ></div>
-                        </div>
-                        {/* Card Caption */}
-                        <div
-                          className="card-caption col-12 p-0"
-                          style={{ minWidth: "200px" }}
-                        >
-                          {/* Card Body */}
-                          <div className="card-body mt-4">
-                            <span>Status: {item.status}</span>
+                            className="image-over"
+                          >
+                            <div
+                           
+                             
+                              className="countdown d-flex justify-content-center"
+                              data-date={item?.bidEndTime}
+                        
+                            ></div>
+                              <img src="placeholder-image.png" alt="Avatar" className='avatar myCollectionsImage' ></img>
+
+                            {/* <NftView src={this.state.source[idx]} /> */}
+                        {/* <NftView src={this.state.source[item.id]} />  */}
+
+
+                         
+                            
+                          </div>
+                          {/* Card Caption */}
+                          <div className="card-caption col-12 p-0">
+                            {/* Card Body */}
+                            <div className="card-body">
+                              <div className="countdown-times mb-3">
+                                <div
+                                  style={{ fontSize: "small" }}
+                                  className="countdown d-flex justify-content-center"
+                                >
+                                  Created at:
+                                  {new Date(
+                                    // data.auctionCreatedAt * 1000
+                                  ).toISOString()}
+                                </div>
+                              </div>
+                              <h5 className="mb-0"></h5>
+                              <a className="seller d-flex align-items-center my-3">
+                                {/* <img  className="avatar-sm rounded-circle" src="" alt="" /> */}
+                                <span
+                                  style={{ fontSize: "large" }}
+                                  className="ml-2 mt-2"
+                                >
+                                  {/* {data.token.name} */}
+                                  {item?.name}
+                                </span>
+                              </a>
+                              <div className="card-bottom d-flex justify-content-between">
+                                <span
+                                  style={{ width: "50%", fontSize: "small" }}
+                                >
+                                 Owned by: {item?.owner}
+                                
+                                </span>
+                                <span>
+                                  {/* <Timer
+                                    idx
+                                    
+                                  /> */}
+                                  {item.price}
+                                </span>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+              </div>
+              <div className="swiper-pagination" />
             </div>
+          </div>
+           
           </div>
         </div>
       </section>
-    );
-  }
+
+
+    </div>
+  )
 }
 
-export default withRouter(Collections);
+
+  

@@ -8,6 +8,11 @@ import Footer from "../Footer/Footer";
 import { from } from "apollo-boost";
 import { useParams, useHistory } from "react-router-dom";
 import axios from "axios";
+import {MdLocalOffer,MdAccountBalanceWallet} from 'react-icons/md'
+import Loading from "../Loading/Loading";
+import women_drink from '../././../Assets/women_drink.jpg'
+
+
 
 
 
@@ -21,6 +26,8 @@ export default function Purchase() {
   const [tokenId, settokenId] = useState()
   const [owneradd, setowneradd] = useState()
   const [nftcontractadd, setnftcontractadd] = useState()
+  let [isSpinner, setIsSpinner] = useState(false)
+
 
 
 
@@ -74,6 +81,9 @@ export default function Purchase() {
   }
 
   const Fatch_Api_data = async () => {
+    const web3 = window.web3;
+
+
     try {
 
       let res = await axios.get("https://whenftapi.herokuapp.com/sell_marketplace_history?id=100")
@@ -82,11 +92,27 @@ export default function Purchase() {
       res = res.data.data[id]
 
       setapiData(res)
-      settokenId(res.tokenId)
       setowneradd(res.owner)
       setnftcontractadd(res.nftContract)
+      let type=res.price
+      // type=parseInt(type)
+
     
-      setnftprice(res.price)
+      // let inputdata = web3.utils.toWei(type);
+
+      let type2=res.itemId
+      // type2=parseInt(type2)
+      // type=typeof(type)
+      // type2=typeof(type2)
+      // console.log("price",inputdata);
+      console.log("itemid",type2);
+      setnftprice(type)
+      settokenId(res.itemId)
+
+
+      // console.log("nftContract",res.nftContract);
+
+
 
 
 
@@ -97,51 +123,43 @@ export default function Purchase() {
 
   const purchaseOrder = async () => {
     let acc = await loadWeb3();
+    setIsSpinner(true)
     if (acc == "No Wallet") {
       toast.error("No Wallet Connected")
+      setIsSpinner(false)
+
     }
     else if (acc == "Wrong Network") {
       toast.error("Wrong Newtwork please connect to test net")
+      setIsSpinner(false)
+
     } else {
       try {
+        setIsSpinner(true)
 
         const web3 = window.web3;
         let nftContractOftoken = new web3.eth.Contract(nftMarketContractAddress_Abi, nftMarketContractAddress);
+        console.log("nft_price",nftprice);
+        let inputdata =  web3?.utils?.toWei((nftprice).toString())
+        console.log("inputdata",inputdata);
 
-
-        let nftTokendata = new web3.eth.Contract(nftmarketTokenAddress_Abi, nftmarketTokenAddress);
-
-        nftprice = web3.utils.toWei(nftprice).tostring();
-        // await nftTokendata.methods.approve(nftMarketContractAddress,nftprice).send({
-        //     from :acc,           
-        // })
-
-
-        
-
-        let getItemId = await nftContractOftoken.methods.tokenIdToItemId(owneradd, tokenId).call();
-        let MarketItemId = await nftContractOftoken.methods.idToMarketItem(getItemId).call();
-        console.log("getItemId", getItemId);
-        console.log("MarketItemId", MarketItemId);
-
-
-
-
-        // await nftContractOftoken.methods.purchaseOrder(1004,nftprice).send({
-        //     from :acc,  
-        //     callValue : 1         
-        // })
-
-        await nftContractOftoken.methods.createMarketSale(getItemId,nftcontractadd).send({
+        await nftContractOftoken.methods.createMarketSale(tokenId,nftcontractadd).send({
           from: acc,
-          value:nftprice
+          value:(inputdata).toString()
+          // value:(web3.utils.toWei(nftprice)).tostring()
+          // value:(1).toString()
 
         }
         );
+        toast.success("Transion Compelete")
+
+        setIsSpinner(false)
 
       }
       catch (e) {
         console.log("Error while addOrder ", e)
+      setIsSpinner(false)
+
       }
     }
 
@@ -161,7 +179,10 @@ export default function Purchase() {
       <section className="mt-4 item-details-area">
         <div className="container">
 
+        {
+            isSpinner ? <Loading /> : <></>
 
+          }
 
           <div className="row justify-content-between">
 
@@ -176,7 +197,7 @@ export default function Purchase() {
                         alt=""
                       /> */}
 
-                  <img src={faker.image.image()} alt="Avatar"
+                  <img src={women_drink} alt="Avatar"
                     style={{ width: "400px", height: "400px" }}
 
 
@@ -446,9 +467,9 @@ export default function Purchase() {
 
                         {/* <span>{this.state.auctions?.reservePrice}</span> /sellmain*/}
                       </div>
-                      <button className='btn btn-lg my-4'
+                      <button className='btn btn-lg my-4 fs-3'
                         onClick={() => purchaseOrder()}
-                      >Purchase</button>
+                      ><MdAccountBalanceWallet className="me-1 fs-3"/>Buy Now</button>
                     </div>
 
                     {/* <div className="card no-hover countdown-times my-4">

@@ -22,6 +22,9 @@ import { BidingContact_Abi, BidingContact } from "../Utils/BidingContact";
 import axios from "axios";
 import { wireNftContractAbi, wireNftContractAddress } from "../Utils/wireNft";
 import Footer from "../Footer/Footer";
+import Loading from "../Loading/Loading";
+import women_drink from '../../Assets/women_drink.jpg'
+
 
 export default function Auctionsbiding() {
   const { id } = useParams();
@@ -35,6 +38,8 @@ export default function Auctionsbiding() {
   let [tokenid, settoken_id] = useState();
   let [ownadd, setownadd] = useState();
   let [NftName, setNftName] = useState()
+  let [isSpinner, setIsSpinner] = useState(false)
+
 
 
   const inputdata_price = useRef();
@@ -78,12 +83,12 @@ export default function Auctionsbiding() {
       wireNftContractAddress
     );
     let walletOfOwner = await nftContractOf.methods.walletOfOwner(acc).call();
-    console.log("polygon", polygonNFTs);
+    // console.log("polygon", polygonNFTs);
     let res_here = await axios.get(
       `https://gateway.pinata.cloud/ipfs/QmXQc7AEmCqrtShVv3k5PdRbhfwgMoHL1HKXMZU4seCe9S/${walletOfOwner[id]}.jpg`
     );
 
-    console.log("lengthtayya", res);
+    // console.log("lengthtayya", res);
     let loopLength = res.length;
     // console.log("Bahir", loopLength);
     let jsonUsrl = res.token_uri;
@@ -121,8 +126,8 @@ export default function Auctionsbiding() {
         img_url, img_url
       },
     ];
-    console.log("Finally Url is ", finalUrl);
-    console.log("count", imageArray);
+    // console.log("Finally Url is ", finalUrl);
+    // console.log("count", imageArray);
 
     setnftdata(imageArray);
 
@@ -132,12 +137,19 @@ export default function Auctionsbiding() {
   const addOrder = async () => {
     let acc = await loadWeb3();
     // console.log("ACC=",acc)
+    setIsSpinner(true)
     if (acc == "No Wallet") {
       toast.error("No Wallet Connected");
+    setIsSpinner(false)
+
     } else if (acc == "Wrong Network") {
       toast.error("Wrong Newtwork please connect to test net");
+    setIsSpinner(false)
+
     } else {
       try {
+        setIsSpinner(true)
+
         const web3 = window.web3;
         let address = "0x4113ccD05D440f9580d55B2B34C92d6cC82eAB3c";
         let value_price = inputdata_price.current.value;
@@ -147,13 +159,22 @@ export default function Auctionsbiding() {
         console.log("ownaddress", value_price);
         if (value_price == " ") {
           toast.error("Please enter the value")
+          setIsSpinner(false)
+
         } else {
           // if (current_time_and_days > curreny_time) {
           // }
 
+          setIsSpinner(true)
+
+
           if (selecthere <= 0) {
             toast.error("Please Select the Days")
+            setIsSpinner(false)
+
           } else {
+            setIsSpinner(true)
+
 
 
             value_price = web3.utils.toWei(value_price);
@@ -161,9 +182,9 @@ export default function Auctionsbiding() {
             let current_time_and_days = 60 * selecthere;
             current_time_and_days = current_time_and_days + curreny_time;
 
-            console.log("selecthere", current_time_and_days);
-            console.log("current_time_and_days", current_time_and_days);
-            console.log("curreny_time", curreny_time);
+            // console.log("selecthere", current_time_and_days);
+            // console.log("current_time_and_days", current_time_and_days);
+            // console.log("curreny_time", curreny_time);
             let nftContractOftoken = new web3.eth.Contract(nftMarketToken_Abi, ownadd);
             let nftContractInstance = new web3.eth.Contract(nftMarketContractAddress_Abi, nftMarketContractAddress);
             // const getItemId = await nftContractInstance.methods.tokenIdToItemId(ownadd, tokenid).call();
@@ -176,20 +197,20 @@ export default function Auctionsbiding() {
               from: acc,
             })
 
+            toast.success("Approve SuccessFul")
 
             let nftContractOf = new web3.eth.Contract(nftMarketContractAddress_Abi, nftMarketContractAddress);
 
-           let hash= await nftContractOf.methods.createMarketItem(tokenid, value_price, 1, true, current_time_and_days, ownadd).send({
+            let hash = await nftContractOf.methods.createMarketItem(tokenid, value_price, 1, true, current_time_and_days, ownadd).send({
               from: acc,
               value: getListingPrice,
             });
             hash = hash.transactionHash
-            console.log("hash", hash);
+            // console.log("hash", hash);
             // setIsSpinner(false)
-            toast.success("Transion Compelete")
             let getItemId = await nftContractOf.methods.tokenIdToItemId(ownadd, tokenid).call();
             let MarketItemId = await nftContractOf.methods.idToMarketItem(getItemId).call();
-            console.log("MarketItemId", MarketItemId)
+            // console.log("MarketItemId", MarketItemId)
             let bidEndTime = MarketItemId.bidEndTime;
             let isOnAuction = MarketItemId.isOnAuction;
             let itemId = MarketItemId.itemId;
@@ -216,8 +237,11 @@ export default function Auctionsbiding() {
               "txn": hash
             })
 
-            console.log("postapiPushdata", postapiPushdata);
-            toast.success("Success")
+            // console.log("postapiPushdata", postapiPushdata);
+            toast.success("Transion Compelete")
+
+            setIsSpinner(false)
+
             // const getAll = await nftContractOf.methods.idToMarketItem(getItemId).call();
             // console.log("getAll", getAll);
             // await axios.post(`https://wire-nft.herokuapp.com/save_auction`, {
@@ -242,6 +266,8 @@ export default function Auctionsbiding() {
         // toast.success("Transion Compelete");
       } catch (e) {
         console.log("Error while addOrder ", e);
+        setIsSpinner(false)
+
       }
     }
   };
@@ -257,6 +283,10 @@ export default function Auctionsbiding() {
     <div>
       <section className="mt-4 item-details-area">
         <div className="container">
+          {
+            isSpinner ? <Loading /> : <></>
+
+          }
           {nftdata.map((items, index) => {
             return (
               <div className="row justify-content-between">
@@ -332,7 +362,7 @@ export default function Auctionsbiding() {
                                                     alt=""
                                                 /> */}
                       <img
-                        src="placeholder-image.png"
+                        src={women_drink}
                         alt="Avatar"
                         style={{ width: "400px", height: "400px" }}
                       />

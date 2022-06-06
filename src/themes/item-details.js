@@ -22,6 +22,10 @@ import { useSelector, useDispatch } from "react-redux";
 import { incrementByAmount } from "../themes/counterSlice";
 
 import { wireNftContractAddress,wireNftContractAbi } from "../components/Utils/wireNft";
+import women_drink from '../Assets/women_drink.jpg'
+import {MdSell} from 'react-icons/md'
+import {RiAuctionFill} from 'react-icons/ri'
+
 
 const ItemDetails = () => {
   let sellnft = useHistory();
@@ -82,6 +86,9 @@ const ItemDetails = () => {
     let symbol = res.symbol;
     let token_id = res.token_id;
     console.log("token_id", token_id);
+    
+    
+     owner_of = owner_of.substring(0, 6) + "..." + owner_of.substring(owner_of.length - 6)
     // if (jsonUsrl.startsWith("ipfs")) {
     //   jsonUsrl = "https://ipfs.moralis.io:2053/ipfs/" + jsonUsrl.split("ipfs://ipfs").slice(-1)[0];
     // } else {
@@ -133,7 +140,7 @@ const ItemDetails = () => {
                   <div className=" p-4 item-thumb text-center">
                     <img
                         style={{ width: "400px", height: "400px" }}
-                        src="auction_1.jpg"
+                        src={women_drink}
 
                         alt=""
                       />
@@ -190,7 +197,7 @@ const ItemDetails = () => {
                         >
                           <img
                             className="avatar-sm rounded-circle mr-3"
-                            src={items.url}
+                            src={women_drink}
                             alt=""
                           />
                           <p className="m-0">
@@ -216,7 +223,7 @@ const ItemDetails = () => {
                           <img
                             className="avatar-sm rounded-circle mr-3"
                             // src={`https://gateway.pinata.cloud/ipfs/QmXQc7AEmCqrtShVv3k5PdRbhfwgMoHL1HKXMZU4seCe9S/${id}.jpg`}
-                            src="placeholder.webp"
+                            src={women_drink}
                             alt=""
                           />
 
@@ -363,7 +370,7 @@ const ItemDetails = () => {
                           <a>
                             <img
                               className="avatar-md rounded-circle"
-                              src="placeholder.webp"
+                              src={women_drink}
                               alt=""
                             />
                           </a>
@@ -398,20 +405,24 @@ const ItemDetails = () => {
                         <div className="price row py-4">
                           <div className="col-lg-6">
                             <button
-                              className="btn btn-lg "
+                              className="btn btn-lg form-control  " style={{paddingBottom:"35px"}}
                               onClick={() => sellnft.push("/sellmain/" + id)}
                             >
-                              Sell
+                              <MdSell className="fs-5"/>
+                              <span className="ms-2 fs-5">Sell</span>
                             </button>
                           </div>
                           <div className="col-lg-6">
                             <button
-                              className="btn btn-lg "
+                              className="btn btn-lg form-control " style={{paddingBottom:"35px"}}
                               onClick={() =>
                                 sellnft.push("/Auctionsbide/" + id)
                               }
                             >
-                              Auctions
+                              
+                              <RiAuctionFill className="fs-5"/>
+                              <span className="ms-2 fs-5">Auctions</span>
+                              
                             </button>
                           </div>
                           <span>

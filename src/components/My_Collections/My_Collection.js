@@ -9,6 +9,7 @@ import { useSelector, useDispatch } from "react-redux";
 
 import { incrementByAmount } from "../../themes/counterSlice";
 import { faker } from "@faker-js/faker";
+import { nftMarketContractAddress, nftMarketContractAddress_Abi } from "../Utils/Contract";
 
 // import { CONTRACT_ABI, CONTRACT_ADDRESS } from '../../config'
 
@@ -20,6 +21,8 @@ function My_Collection() {
   let [mywalletLength, setMyWalletLength] = useState();
   let [pageNumber, setPageNumber] = useState(1);
   let [totalPages, setTotalPages] = useState(1);
+  let [btnDisable, setbtnDisable] = useState(false);
+
   let myHistory = useHistory();
 
   const Web3Api = useMoralisWeb3Api();
@@ -64,7 +67,7 @@ function My_Collection() {
     let res = polygonNFTs.result;
     // console.log("length", res);
     let loopLength = res.length;
-    console.log("Bahir", loopLength);
+    // console.log("Bahir", loopLength);
 // for(let j=0;j<loopLength;j++){
 //   let walletOfOwner = await nftContractOf.methods.walletOfOwner(acc).call();
 //       let res_here = await axios.get(
@@ -78,10 +81,10 @@ function My_Collection() {
 
     for (let i = 0; i < loopLength; i++) {
       console.log("count", i);
-      console.log("length", res[i]);
-      console.log("Images , ", res[i].token_uri);
+      // console.log("length", res[i]);
+      // console.log("Images , ", res[i].token_uri);
       let walletOfOwner = await nftContractOf.methods.walletOfOwner(acc).call();
-      console.log("count", walletOfOwner);
+    
 
       // let res_here = await axios.get(
       //   `https://gateway.pinata.cloud/ipfs/QmXQc7AEmCqrtShVv3k5PdRbhfwgMoHL1HKXMZU4seCe9S/${walletOfOwner[i]}.jpg`
@@ -124,8 +127,7 @@ function My_Collection() {
           // img_url:img_url
         },
       ];
-      console.log("Finally Url is ", finalUrl);
-      console.log("count", imageArray);
+    
     }
     setnftdata(imageArray);
   };
@@ -183,17 +185,17 @@ function My_Collection() {
       let walletOfOwner = await nftContractOf.methods.walletOfOwner(acc).call();
       let walletLength = walletOfOwner.length;
       setMyWalletLength(walletLength);
-      console.log("walletOfOwner", walletOfOwner);
+      // console.log("walletOfOwner", walletOfOwner);
       let ttlPage = parseInt(walletLength) / 6;
       ttlPage = Math.ceil(ttlPage);
       setTotalPages(ttlPage);
-      console.log("Total Pages", ttlPage);
+      // console.log("Total Pages", ttlPage);
       if (parseInt(walletLength) > 0) {
         {
           let myImgArry = [];
           let myNameDate = [];
           for (let i = 1; i <= walletLength; i++) {
-            console.log("For loop", i);
+            // console.log("For loop", i);
             try {
               let res = await axios.get(
                 `https://gateway.pinata.cloud/ipfs/QmXQc7AEmCqrtShVv3k5PdRbhfwgMoHL1HKXMZU4seCe9S/${walletOfOwner[i]}.jpg`
@@ -202,7 +204,7 @@ function My_Collection() {
               // let dna = res.data.dna
               simplleArray = [...simplleArray, { imageUrl: res }];
               setImageArray(simplleArray);
-              console.log("Getting Response", res.config.url);
+              // console.log("Getting Response", res.config.url);
             } catch (e) {
               console.log("Error while Fetching Api", e);
             }
@@ -211,6 +213,46 @@ function My_Collection() {
       }
     }
   };
+
+
+const claim_Widthdraw =async()=>{
+  let acc = await loadWeb3();
+  const web3 = window.web3;
+
+
+  try{
+
+    let nftContractOf = new web3.eth.Contract(nftMarketContractAddress_Abi, nftMarketContractAddress);
+    let Widthdraw = await nftContractOf.methods.getDueAmount(acc).call();
+    console.log("Widthdraw",Widthdraw);
+if(Widthdraw==0){
+  setbtnDisable(true)
+}else{
+  setbtnDisable(false)
+
+}
+
+  }catch(e){
+
+  }
+}
+const WidthdrawDueAmount=async()=>{
+  let acc = await loadWeb3();
+  const web3 = window.web3;
+  try{
+    let nftContractOf = new web3.eth.Contract(nftMarketContractAddress_Abi, nftMarketContractAddress);
+    await nftContractOf.methods.withdrawDueAmount().send({
+      from: acc,
+   
+    });
+
+
+  }catch(e){
+    console.log("Error While WidthdrawDueAmount ",e);
+  }
+}
+
+
 
   useEffect(() => {
     if (isInitialized) {
@@ -222,6 +264,10 @@ function My_Collection() {
     allImagesNfts();
     getAccount();
     fetchNFTs();
+    setInterval(() => {
+      claim_Widthdraw()
+
+    }, 1000)
 
     // setInterval(() => {
 
@@ -233,11 +279,17 @@ function My_Collection() {
         <div className="row justify-content-between">
           <div className="">
             {/* Intro */}
-            <div className="intro mt-5 mt-lg-0 mb-4 mb-lg-5">
+            <div className="intro mt-5 mt-lg-0 mb-4 mb-lg-5 main_my_colution_here">
               <div className="intro-content">
                 <span>Get Started</span>
                 <h3 className="mt-3 mb-0">My Collections</h3>
               </div>
+
+              <div className="btn_div">
+                <button className="btn" disabled={btnDisable} onClick={()=>WidthdrawDueAmount()}>WidthDraw Dua Amount</button>
+              </div>
+
+
             </div>
 
             <div className="row items">
@@ -246,7 +298,7 @@ function My_Collection() {
                 // let myVar = index+1;
                 let myvar = index;
 
-                console.log("myVar ", myvar);
+                // console.log("myVar ", myvar);
 
                 return (
                   <div className="col-10 col-sm-4 mr-5 col-lg-3 mt-4">

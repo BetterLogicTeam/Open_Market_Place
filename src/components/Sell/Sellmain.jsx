@@ -23,6 +23,9 @@ import {
 // import { getallNFTs } from "../../reducers/Get_Nfts/grt_nft.reducer";
 import { getAllNFT } from "../../reducers/Get_Nfts/getNFT.reducer";
 import { wireNftContractAbi, wireNftContractAddress } from "../Utils/wireNft";
+import Loading from "../Loading/Loading";
+import women_drink from '../././../Assets/women_drink.jpg'
+
 
 export default function Sellmain() {
   const { id } = useParams();
@@ -228,27 +231,27 @@ export default function Sellmain() {
 
 
       try {
-        // setIsSpinner(true)
+        setIsSpinner(true)
         const web3 = window.web3;
         let address = "0x4113ccD05D440f9580d55B2B34C92d6cC82eAB3c"
         let value_price = inputdata_price.current.value;
 
         if (value_price == "") {
           toast.error("Please Enter the Price")
-          // setIsSpinner(false)
+          setIsSpinner(false)
         }
         else {
 
-          // setIsSpinner(true)
+          setIsSpinner(true)
 
 
           if (value_price <= 0) {
             toast.error("Please Enter Price Greater the 0")
-            // setIsSpinner(false)
+            setIsSpinner(false)
 
           }
           else {
-            // setIsSpinner(true)
+            setIsSpinner(true)
 
             value_price = web3.utils.toWei(value_price)
             let curreny_time = Math.floor(new Date().getTime() / 1000.0)
@@ -278,10 +281,10 @@ export default function Sellmain() {
             await nftContractOftoken.methods.setApprovalForAll(nftMarketContractAddress, true).send({
               from: acc,
             })
-            // setIsSpinner(false)
+            setIsSpinner(false)
 
             toast.success("Approved Successfuly")
-            // setIsSpinner(true)
+            setIsSpinner(true)
 
             let nftContractOf = new web3.eth.Contract(nftMarketContractAddress_Abi, nftMarketContractAddress);
             let hash = await nftContractOf.methods.createMarketItem(tokenid, value_price, 1, false, curreny_time, ownadd).send({
@@ -291,8 +294,6 @@ export default function Sellmain() {
             })
             hash = hash.transactionHash
             console.log("hash", hash);
-            // setIsSpinner(false)
-            toast.success("Transion Compelete")
             let getItemId = await getodernumberhere.methods.tokenIdToItemId(ownadd, tokenid).call();
             let MarketItemId = await getodernumberhere.methods.idToMarketItem(getItemId).call();
             console.log("MarketItemId", MarketItemId)
@@ -323,7 +324,11 @@ export default function Sellmain() {
             })
 
             console.log("postapiPushdata", postapiPushdata);
-            toast.success("Success")
+            // toast.success("Success")
+            setIsSpinner(false)
+            toast.success("Transion Compelete")
+
+
 
 
           }
@@ -331,7 +336,7 @@ export default function Sellmain() {
       }
       catch (e) {
         console.log("Error while addOrder ", e)
-        // setIsSpinner(false)
+        setIsSpinner(false)
 
 
       }
@@ -348,10 +353,10 @@ export default function Sellmain() {
       {/* {console.log("order_deatails", nftdata)} */}
       <section className="mt-4 item-details-area">
         <div className="container">
-          {/* {
-      isSpinner ? <Spinner/> : <></>
+          {
+      isSpinner ? <Loading/> : <></>
 
-    } */}
+    }
 
           {
 
@@ -454,7 +459,7 @@ export default function Sellmain() {
                                                   src={items.url}
                                                     alt=""
                                                 /> */}
-                        <img src={items.url} alt="Avatar"
+                        <img src={women_drink} alt="Avatar"
                           style={{ width: "400px", height: "400px" }}
 
 

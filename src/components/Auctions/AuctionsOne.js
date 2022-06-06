@@ -76,12 +76,75 @@ const data = [
   },
 ];
 
-const Timer = ({ start, duration }) => {
-  const [time, setTime] = useState(start + duration - Date.now());
+const Timer = ({ start}) => {
+  // const [time, setTime] = useState(start + duration - Date.now());
+  
+  const auction = async () => {
+    const web3 = window.web3;
+    let acc = loadWeb3()
+
+
+ 
+    let res = await axios.get(
+      `https://whenftapi.herokuapp.com/OnAuction_marketplace_history?id=100`
+    );
+
+             
+  
+
+let     alldata_here = res.data.data[start]
+    alldata_here = alldata_here.itemId;
+    let base_price = res.data.data[start]
+    base_price = base_price.price
+    let bidEndTime = res.data.data[start]
+    bidEndTime = bidEndTime.bidEndTime   
+    let nftContract = res.data.data[start]
+    nftContract = nftContract.nftContract
+   
+    // setbase_price(base_price)
+    // settokenId(alldata_here)
+    // setnftcontactadd(nftContract)
+
+
+    var currentDateTime = new Date();
+    let resultInSeconds = currentDateTime.getTime() / 1000;
+    let Time_here =bidEndTime-resultInSeconds 
+    let TimeFinal = parseInt(Time_here)
+
+
+
+
+
+    if (TimeFinal <= 0) {
+   
+      return <div>Ended</div>;
+      // setboluher(false)
+    } else {
+      let days = parseInt(TimeFinal/86400)
+     
+      // setDays_here(days)
+      TimeFinal = TimeFinal % (86400)
+      let hours = parseInt(TimeFinal / 3600)
+      // setHours_here(hours)
+      TimeFinal %= 3600
+      let munites = parseInt(TimeFinal / 60)
+      // setMunits_here(munites)
+      TimeFinal %= 60
+      let second_here = parseInt(TimeFinal)
+      // setSeconds(second_here)
+      
+    return  second_here;
+     
+    }
+
+   
+
+   
+  };
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setTime((t) => t - 1000);
+      auction()
     }, 1000);
 
     return () => {
@@ -90,22 +153,22 @@ const Timer = ({ start, duration }) => {
   }, []);
 
   const showTime = (curr) => {
-    let t = parseInt(curr / 1000);
-    const sec = t % 60;
-    t = parseInt(t / 60);
-    const min = t % 60;
-    t = parseInt(t / 60);
+    // let t = parseInt(curr / 1000);
+    // const sec = t % 60;
+    // t = parseInt(t / 60);
+    // const min = t % 60;
+    // t = parseInt(t / 60);
 
-    let timer = "";
-    if (t > 0) timer += t + "H ";
-    if (min > 0) timer += min + "M ";
-    timer += sec + "S";
+    // let timer = "";
+    // if (t > 0) timer += t + "H ";
+    // if (min > 0) timer += min + "M ";
+    // timer += sec + "S";
 
-    return timer;
+    return ;
   };
 
-  if (time > 0) return <div>{showTime(time)}</div>;
-  return <div>Ended</div>;
+  // if (time > 0) return <div>{showTime(time)}</div>;
+  // return <div>Ended</div>;
 };
 const NftView = ({ src }) => {
   const [img, setImg] = useState(true);
@@ -254,7 +317,7 @@ class AuctionsOne extends Component {
   `;
     try {
       const response = await axios.post(
-        "https://api.thegraph.com/subgraphs/name/vjbhandari61/saimart",
+        "https://whenftapi.herokuapp.com/OnAuction_marketplace_history?id=100",
         {
           query,
         }
@@ -291,7 +354,7 @@ class AuctionsOne extends Component {
   };
   auction = async () => {
     const res = await axios.get(
-      `https://wire-nft.herokuapp.com/get_auctions_list`
+      `https://whenftapi.herokuapp.com/OnAuction_marketplace_history?id=100`
     );
     console.log("liveress", res);
     this.setState({
@@ -351,15 +414,15 @@ this.auction()
                 {liveAuctions && liveAuctions.slice(0, currentLoad).map((item, idx) => {
                     return (
                       <div
-                        // onClick={() =>
-                        //   this.props.history.push(
-                        //     `/details/${data.token.id}`,
-                        //     this.state.data
-                        //   )
-                        // }
-                        // style={{ cursor: "pointer", height: "410px" }}
+                        onClick={() =>
+                          this.props.history.push(
+                            `/AuctionModal/${idx}`,
+                            this.state.data
+                          )
+                        }
+                        style={{ cursor: "pointer", height: "410px" }}
                         key={`auc_${idx}`}
-                        className="swiper-slideitem liveauction-card"
+                        className="swiper-slideitem liveauction-card mb-5"
                       >
                         <div
                           style={{ cursor: "pointer", width: "350px" }}
@@ -368,39 +431,24 @@ this.auction()
                           <div
                             style={{
                               overflow: "visible",
-                              // height: "250px",
+                              // height: "500px",
                               // width: "350px",
                             }}
                             className="image-over"
                           >
                             <div
-                              // style={{
-                              //   backgroundImage: `url(${
-                              //     this.state.source[data.token.id]
-                              //   })`,
-                              //   height: "250px",
-                              //   width: "100%",
-                              //   backgroundRepeat: "no-repeat",
-                              //   backgroundPosition: "center",
-                              //   backgroundSize: "cover",
-                              // }}
+                           
                              
                               className="countdown d-flex justify-content-center"
                               data-date={item?.bidEndTime}
                         
                             ></div>
                             {/* <NftView src={this.state.source[idx]} /> */}
-                        <NftView src={this.state.source[item.id]} /> 
+                        {/* <NftView src={this.state.source[item.id]} />  */}
+                        <img src="placeholder-image.png" alt="" />
 
 
-                            {/* <video
-                              autoPlay
-                              loop
-                              muted
-                              className="card-img-top"
-                              src={this.state.source}
-                              alt=""
-                            ></video> */}
+                         
                             
                           </div>
                           {/* Card Caption */}
@@ -437,10 +485,11 @@ this.auction()
                                 
                                 </span>
                                 <span>
-                                  <Timer
-                                    start={data.auctionCreatedAt * 1000}
-                                    duration={data.duration * 60 * 60 * 1000}
-                                  />
+                                  {/* <Timer
+                                    idx
+                                    
+                                  /> */}
+                                  {item.price}
                                 </span>
                               </div>
                             </div>

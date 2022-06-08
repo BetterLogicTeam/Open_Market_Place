@@ -25,3 +25,13 @@ color: aliceblue !important;
     font-size: 25px;
    
 }
+
+@media screen and (max-width:600px) {
+    .timer_here{
+        display: flex;
+        justify-content:center;
+        flex-direction: column;
+        align-items: center;
+        padding-bottom: 2rem;
+     }
+}

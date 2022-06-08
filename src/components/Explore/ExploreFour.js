@@ -38,6 +38,7 @@ export default function ExploreFour() {
       let res = await axios.get("https://whenftapi.herokuapp.com/sell_marketplace_history?id=100")
       console.log("res", res.data.data);
       res = res.data.data
+      console.log("res",res.bidEndTime);
       setapiData(res)
 
 
@@ -147,9 +148,10 @@ export default function ExploreFour() {
                                   className="countdown d-flex justify-content-center"
                                 >
                                   Created at:
-                                  {new Date(
+                                  {items.edate}
+                                  {/* {new Date(
 
-                                  ).toISOString()}
+                                  ).toISOString()} */}
                                 </div>
                               </div>
                               <h5 className="mb-0"></h5>
@@ -165,7 +167,12 @@ export default function ExploreFour() {
                                 <span
                                   style={{ width: "50%", fontSize: "small" }}
                                 >
-                                  Owned by:{items.owner}
+                                  Owned by:
+                                  {
+                                    
+                                    items.useraddress.substring(0, 6) + "..." + items.useraddress.substring(items.useraddress.length - 6)
+
+                                  }
                                   {/* {orderdata.buyer} */}
                                 </span>
                                 <span>

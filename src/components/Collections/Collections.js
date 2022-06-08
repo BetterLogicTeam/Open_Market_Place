@@ -118,10 +118,8 @@ export default function Collections() {
                                   style={{ fontSize: "small" }}
                                   className="countdown d-flex justify-content-center"
                                 >
-                                  Created at:
-                                  {new Date(
-                                    // data.auctionCreatedAt * 1000
-                                  ).toISOString()}
+                                  Created at:{item.edate}
+                                 
                                 </div>
                               </div>
                               <h5 className="mb-0"></h5>

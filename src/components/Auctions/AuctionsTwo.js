@@ -117,10 +117,10 @@ export default function AuctionsTwo() {
                                   style={{ fontSize: "small" }}
                                   className="countdown d-flex justify-content-center"
                                 >
-                                  Created at:
-                                  {new Date(
+                                  Created at:{items.edate}
+                                  {/* {new Date(
 
-                                  ).toISOString()}
+                                  ).toISOString()} */}
                                 </div>
                               </div>
                               <h5 className="mb-0"></h5>

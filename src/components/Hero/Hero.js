@@ -38,15 +38,15 @@ const Hero = () => {
               {!useraddress ? (
                 <a
                   onClick={() => alert("Sign In with Metamask!")}
-                  className="btn btn-bordered-white"
-                  href="#"
+                  className="btn btn-bordered-white "
+                  
                 >
                   <i className="icon-note mr-2" />
                   {data.btn_2}
                 </a>
               ) : (
                 <a
-                  className="btn btn-bordered-white"
+                  className="btn btn-bordered-white "
                   onClick={() => {
                     history.push("/create");
                   }}

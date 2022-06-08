@@ -286,7 +286,7 @@ const WidthdrawDueAmount=async()=>{
               </div>
 
               <div className="btn_div">
-                <button className="btn" disabled={btnDisable} onClick={()=>WidthdrawDueAmount()}>WidthDraw Dua Amount</button>
+                <button className="btn" disabled={btnDisable} onClick={()=>WidthdrawDueAmount()}>WidthDraw Due Amount</button>
               </div>
 
 

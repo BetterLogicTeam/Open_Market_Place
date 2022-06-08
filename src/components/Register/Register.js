@@ -5,6 +5,7 @@ import { db, storageRef, storage } from "../../firebase";
 import { useSelector } from "react-redux";
 import { selectUserAddress } from "../../features/userSlice";
 import { useHistory } from "react-router-dom";
+import axios from "axios";
 
 const Register = () => {
   const [name, setName] = useState("");
@@ -93,6 +94,36 @@ const Register = () => {
     handleFireBaseUpload();
   };
 
+  const PostData = async () => {
+    try {
+
+      console.log("useraddress",useraddress);
+      console.log("useraddress",name);
+
+      console.log("useraddress",email);
+
+      console.log("useraddress",bio);
+
+      let image_here=imageAsFile.name
+      console.log("useraddress",image_here);
+      
+      let res = await axios.post("https://whenftapi.herokuapp.com/update_user_profile", {
+        "address": useraddress,
+        "username":name ,
+        "email": email,
+        "bio": bio,
+        "image": image_here
+      })
+
+      console.log("res",res);
+
+
+
+    } catch (e) {
+      console.log("Error while fatech api", e);
+    }
+  }
+
   return (
   
         <div className="editProfile">
@@ -103,7 +134,7 @@ const Register = () => {
         <div className="form">
           <form>
             <div className="form__content">
-              <h4 className="form__text">Display Name</h4>
+              <h4 className="form__text">User Name</h4>
               <input
                 value={name}
                 onChange={handleName}
@@ -154,7 +185,7 @@ const Register = () => {
                 Get Verified
               </button>
             </div>
-            <button onClick={handleSubmit} className="editProfile__button">
+            <button onClick={()=>PostData()} className="editProfile__button">
               Register
             </button>
           </div>

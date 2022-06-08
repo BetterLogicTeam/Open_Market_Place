@@ -142,7 +142,32 @@ const UserProfile = () => {
   if (useraddress && !nftData) {
     getUserNFTs();
   }
-  useEffect(() => {}, []);
+
+
+  // const PostData = async () => {
+  //   try {
+
+     
+  //     console.log("useraddress",useraddress);
+  //     let res = await axios.post("https://whenftapi.herokuapp.com/get_user_profile", {
+  //       "address": useraddress,
+     
+  //     })
+
+  //     console.log("res",res);
+
+
+
+  //   } catch (e) {
+  //     console.log("Error while fatech api", e);
+  //   }
+  // }
+
+
+  useEffect(() => {
+
+    // PostData()
+  }, []);
   return (
     <div className="userProfile">
       <div className="userProfile__container1">

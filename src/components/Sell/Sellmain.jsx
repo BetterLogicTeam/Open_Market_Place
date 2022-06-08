@@ -306,6 +306,7 @@ export default function Sellmain() {
             let seller = MarketItemId.seller;
             let sold = MarketItemId.sold;
             let tokenId = MarketItemId.tokenId;
+           
 
             price = web3.utils.fromWei(price)
             let postapiPushdata = await axios.post('https://whenftapi.herokuapp.com/open_marketplace', {

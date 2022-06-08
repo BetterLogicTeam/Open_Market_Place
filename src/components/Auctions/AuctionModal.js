@@ -47,6 +47,8 @@ export default function AuctionModal() {
   const [SendAddress, setSendAddress] = useState()
   const [HighestBideradd, setHighestBideradd] = useState()
   let [isSpinner, setIsSpinner] = useState(false)
+  const [Token_Id, setToken_Id] = useState()
+
 
 
 
@@ -69,6 +71,11 @@ export default function AuctionModal() {
     let sender_address = res.data.data[id]
     sender_address = sender_address.useraddress
     setSendAddress(sender_address)
+    let tokenId_here=res.data.data[id]
+    tokenId_here=tokenId_here.tokenId;
+    setToken_Id(tokenId_here)
+
+    // console.log("tokenId_herehhhhhhhhhhhhh",tokenId_here);
 
 
     alldata_here = res.data.data[id]
@@ -161,7 +168,7 @@ export default function AuctionModal() {
 
 
             // getinputdata=getinputdata.parseInt()
-            console.log("getinputdata", getinputdata2);
+            // console.log("getinputdata", getinputdata2);
 
 
             let nftContractOf = new web3.eth.Contract(nftMarketContractAddress_Abi, nftMarketContractAddress);
@@ -218,6 +225,14 @@ export default function AuctionModal() {
         await nftContractOf.methods.claimBidItem(tokenId, nftcontactadd).send({
           from: acc,
         })
+
+        let postapiPushdata = await axios.post('https://whenftapi.herokuapp.com/update_auction_status', {
+       
+          "tokenid": Token_Id,
+         
+        })
+        console.log("postapiPushdata",postapiPushdata);
+
         setIsSpinner(false)
         toast.success("Transion Compelete")
 
@@ -266,7 +281,7 @@ export default function AuctionModal() {
                   <div className="col-12 item  p-2">
 
 
-                    <div className="card no-hover px-5 ">
+                    <div className="card no-hover  ">
                       <div className="single-seller ">
                         <div className="seller-info mt-3">
 

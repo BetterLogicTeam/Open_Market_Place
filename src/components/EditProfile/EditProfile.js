@@ -5,6 +5,7 @@ import { db, storageRef, storage } from "../../firebase";
 import { useSelector } from "react-redux";
 import { selectUserAddress } from "../../features/userSlice";
 import { useHistory } from "react-router-dom";
+import axios from "axios";
 
 const EditProfile = () => {
   const [name, setName] = useState("");
@@ -97,35 +98,55 @@ const EditProfile = () => {
     handleFireBaseUpload();
   };
 
+  // const PostData = async () => {
+  //   try {
+
+  //     let res = await axios.get("https://whenftapi.herokuapp.com/update_user_profile", {
+  //       "address": useraddress,
+  //       "username":name ,
+  //       "email": email,
+  //       "bio": bio,
+  //       "image": imageAsFile
+  //     })
+
+  //     console.log("res",res);
+
+
+
+  //   } catch (e) {
+  //     console.log("Error while fatech api", e);
+  //   }
+  // }
+
   return (
     <div className="editProfile">
       <div className="editProfile__container1">
         <h1 className="editProfile__text">Edit Profile</h1>
         <div className="form">
           <div className="form__content">
-            <h4 className="form__text">Display Name</h4>
+            <h4 className="form__text">User Name</h4>
             <input value={name} onChange={handleName} className="form__input" />
           </div>
-          <div className="form__content">
+          {/* <div className="form__content">
             <h4 className="form__text">Custom Url</h4>
             <input value={url} onChange={handleUrl} className="form__input" />
-          </div>
+          </div> */}
           <div className="form__content">
             <h4 className="form__text">Bio</h4>
             <input value={bio} onChange={handleBio} className="form__input" />
           </div>
-          <div className="form__content">
+          {/* <div className="form__content">
             <h4 className="form__text">Twitter Username</h4>
             <input
               value={twitter}
               onChange={handleTwitter}
               className="form__input"
             />
-          </div>
-          <div className="form__content">
+          </div> */}
+          {/* <div className="form__content">
             <h4 className="form__text">Personal Site or Portfolio</h4>
             <input value={site} onChange={handleSite} className="form__input" />
-          </div>
+          </div> */}
           <div className="form__content">
             <h4 className="form__text">Email</h4>
             <input
@@ -143,7 +164,12 @@ const EditProfile = () => {
                 Save Profile
               </button>
             ) : (
-              <button onClick={handleEdit} className="editProfile__button">
+              <button 
+
+              // onClick={()=>PostData()}
+              onClick={handleEdit} 
+              
+              className="editProfile__button">
                 Save Profile
               </button>
             )}

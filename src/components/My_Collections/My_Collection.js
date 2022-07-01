@@ -269,9 +269,6 @@ const WidthdrawDueAmount=async()=>{
 
     }, 1000)
 
-    // setInterval(() => {
-
-    // }, 1000);
   }, []);
   return (
     <section className="mt-4 author-area">

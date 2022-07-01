@@ -2,7 +2,7 @@
   
   select option {
     /* margin: 40px; */
-    background: rgba(0, 0, 0, 0.955);
+    background: #ffff;
     color: #fff;
     /* text-shadow: 0 1px 0 rgba(0, 0, 0, 0.12); */
   }
@@ -27,7 +27,7 @@
     /* display: flex; */
     padding: 10px 20px 10px 20px;
     color: #595959;
-    background-color: rgba(0, 0, 0, 0.12);
+    background-color:#fff;
     border: 1px solid #d6d6d6;
     border-radius: 30px;
     font-size: 14px;
